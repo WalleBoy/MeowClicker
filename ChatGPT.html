@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meow Clicker</title>
+    <script src="style.css"></script>
+</head>
+<body>
+    <h1>Meow Clicker</h1>
+    <p>You have <span id="meow-count">0</span> meows.</p>
+    <button id="meow-button">Click Me!</button>
+
+    <div id="shop">
+        <h2>Shop</h2>
+        <div class="shop-item">
+            <p>Upgrade: +1 meow per click (Cost: 10 meows)</p>
+            <button id="upgrade-button">Buy Upgrade</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables
+        let meowCount = 0;
+        let meowsPerClick = 1;
+
+        // DOM Elements
+        const meowCountElement = document.getElementById("meow-count");
+        const meowButton = document.getElementById("meow-button");
+        const upgradeButton = document.getElementById("upgrade-button");
+
+        // Click event for "Meow Button"
+        meowButton.addEventListener("click", () => {
+            meowCount += meowsPerClick;
+            updateMeowCount();
+        });
+
+        // Click event for "Upgrade Button"
+        upgradeButton.addEventListener("click", () => {
+            const upgradeCost = 10;
+
+            if (meowCount >= upgradeCost) {
+                meowCount -= upgradeCost;
+                meowsPerClick += 1;
+                updateMeowCount();
+                alert("Upgrade purchased! You now earn more meows per click.");
+            } else {
+                alert("Not enough meows to buy this upgrade.");
+            }
+        });
+
+        // Function to update the displayed meow count
+        function updateMeowCount() {
+            meowCountElement.textContent = meowCount;
+        }
+    </script>
+</body>
+</html>
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #a8e063, #56ab2f);
+      color: #fff;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin: 20px 0;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px #000;
+    }
+
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background: #2c3e50;
+      border-radius: 10px;
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    p {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      text-shadow: 1px 1px #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Snake Game</h1>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <p>Use W, A, S, D to move the snake. Can you beat your high score?</p>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Game settings
+    const gridSize = 20; // Size of each grid cell
+    const gridCount = canvas.width / gridSize;
+    let snake = [{ x: 10, y: 10 }]; // Initial snake position
+    let food = { x: 5, y: 5 }; // Initial food position
+    let direction = { x: 0, y: 0 }; // Initial direction
+    let score = 0;
+    let highScore = 0;
+
+    // Gradient for snake
+    const snakeGradient = ctx.createLinearGradient(0, 0, 400, 400);
+    snakeGradient.addColorStop(0, "#1abc9c");
+    snakeGradient.addColorStop(1, "#16a085");
+
+    // Draw a rounded rectangle
+    function drawRoundedRect(color, x, y, size, radius) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.arcTo(x + size, y, x + size, y + size, radius);
+      ctx.arcTo(x + size, y + size, x, y + size, radius);
+      ctx.arcTo(x, y + size, x, y, radius);
+      ctx.arcTo(x, y, x + size, y, radius);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Spawn food at a random position
+    function spawnFood() {
+      food.x = Math.floor(Math.random() * gridCount);
+      food.y = Math.floor(Math.random() * gridCount);
+    }
+
+    // Main game loop
+    function gameLoop() {
+      // Move the snake
+      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+      snake.unshift(head);
+
+      // Check for collision with food
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        if (score > highScore) highScore = score;
+        spawnFood();
+      } else {
+        snake.pop(); // Remove the tail if no food is eaten
+      }
+
+      // Check for collision with walls or itself
+      if (
+        head.x < 0 ||
+        head.y < 0 ||
+        head.x >= gridCount ||
+        head.y >= gridCount ||
+        snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
+      ) {
+        alert(`Game Over! Your score: ${score}`);
+        // Reset game
+        snake = [{ x: 10, y: 10 }];
+        direction = { x: 0, y: 0 };
+        score = 0;
+        spawnFood();
+      }
+
+      // Draw everything
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw snake
+      snake.forEach(segment => {
+        drawRoundedRect(snakeGradient, segment.x * gridSize, segment.y * gridSize, gridSize, 5);
+      });
+
+      // Draw food with rounded edges
+      drawRoundedRect("#e74c3c", food.x * gridSize, food.y * gridSize, gridSize, 8);
+
+      // Display score
+      ctx.fillStyle = "#ecf0f1";
+      ctx.font = "18px Arial";
+      ctx.fillText(`Score: ${score}`, 10, 20);
+      ctx.fillText(`High Score: ${highScore}`, canvas.width - 120, 20);
+    }
+
+    // Change direction based on key presses (WASD or arrow keys)
+    document.addEventListener("keydown", event => {
+      switch (event.key) {
+        case "ArrowUp":
+        case "w":
+        case "ц":
+        case "W":
+        case "Ц":
+          if (direction.y === 0) direction = { x: 0, y: -1 };
+          break;
+        case "ArrowDown":
+        case "s":
+        case "і":
+        case "S":
+        case "І":
+          if (direction.y === 0) direction = { x: 0, y: 1 };
+          break;
+        case "ArrowLeft":
+        case "a":
+        case "ф":
+        case "A":
+        case "Ф":
+          if (direction.x === 0) direction = { x: -1, y: 0 };
+          break;
+        case "ArrowRight":
+        case "d":
+        case "в":
+        case "D":
+        case "":
+          if (direction.x === 0) direction = { x: 1, y: 0 };
+          break;
+      }
+    });
+
+    // Start the game loop
+    setInterval(gameLoop, 100);
+  </script>
+</body>
+</html> -->
